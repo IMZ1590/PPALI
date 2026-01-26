@@ -1,0 +1,12 @@
+fastapi
+Flask
+uvicorn
+nmrglue
+numpy
+pandas
+scipy
+scikit-learn
+matplotlib
+seaborn
+python-multipart
+jinja2
