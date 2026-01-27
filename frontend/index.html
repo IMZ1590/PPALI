@@ -144,28 +144,25 @@
                     <!-- Outlier Residues Table -->
 
                     <div id="outlier-section" class="glass p-6 rounded-2xl hidden top-6">
-                        <h2 class="text-xl font-semibold mb-4 text-rose-600">Outlier Residues (P-value < 0.05 or Dist>
-                                3.0)
-                        </h2>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm text-left text-slate-700">
-                                <thead class="text-xs text-slate-600 uppercase bg-slate-50/50">
-                                    <tr>
-                                        <th class="px-4 py-3">Residue No.</th>
-                                        <th class="px-4 py-3 text-center">PC1</th>
-                                        <th class="px-4 py-3 text-center">PC2</th>
-                                        <th class="px-4 py-3 text-center">PC3</th>
-                                        <th class="px-4 py-3 text-center">Combined Dist.</th>
-                                        <th class="px-4 py-3 text-center">Mahalanobis</th>
-                                        <th class="px-4 py-3 text-center">P-value</th>
-                                        <th class="px-4 py-3 text-right">Reason</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="outlier-table-body">
-                                    <!-- Rows added dynamically -->
-                                </tbody>
-                            </table>
-                        </div>
+                        <h2 class="text-xl font-semibold mb-4 text-rose-600">Outlier Residues (P-value < 0.05)</h2>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm text-left text-slate-700">
+                                        <thead class="text-xs text-slate-600 uppercase bg-slate-50/50">
+                                            <tr>
+                                                <th class="px-4 py-3">Residue No.</th>
+                                                <th class="px-4 py-3 text-center">PC1</th>
+                                                <th class="px-4 py-3 text-center">PC2</th>
+                                                <th class="px-4 py-3 text-center">PC3</th>
+                                                <th class="px-4 py-3 text-center">Mahalanobis</th>
+                                                <th class="px-4 py-3 text-center">P-value</th>
+                                                <th class="px-4 py-3 text-center">Sig. Level</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="outlier-table-body">
+                                            <!-- Rows added dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
                     </div>
 
                     <!-- PDB Structure Viewer (Conditional) -->
@@ -414,10 +411,8 @@
                 // However, holding on to strong geometric outliers might be safe.
                 // Let's make it an OR condition for robustness, or prioritize P-value.
                 // If stats are available, use P-value. If not, Dist.
-                if (!hasStats && dist > EUCLIDEAN_THRESHOLD) {
-                    isOutlier = true;
-                    reason.push(`Dist > ${EUCLIDEAN_THRESHOLD}`);
-                }
+                // Fallback removed
+                // if (!hasStats && dist > EUCLIDEAN_THRESHOLD) ...
 
                 // Also Keep Component-wise check for visual "Reason" explanation if it helps?
                 // Actually, let's just stick to the main stat criteria to keep it clean.
@@ -433,7 +428,7 @@
                         <td class="px-4 py-3 text-center ${Math.abs(s1) > 1.5 ? 'text-rose-600' : ''}">${s1.toFixed(2)}</td>
                         <td class="px-4 py-3 text-center ${Math.abs(s2) > 1.5 ? 'text-rose-600' : ''}">${s2.toFixed(2)}</td>
                         <td class="px-4 py-3 text-center ${Math.abs(s3) > 1.5 ? 'text-rose-600' : ''}">${s3.toFixed(2)}</td>
-                        <td class="px-4 py-3 text-center font-bold text-slate-700">${dist.toFixed(2)}</td>
+
                         <td class="px-4 py-3 text-center font-mono text-xs text-indigo-600">${mahaStr}</td>
                         <td class="px-4 py-3 text-center font-mono text-xs ${hasStats && data.p_values[idx] < P_VALUE_THRESHOLD ? 'text-red-600 font-bold' : 'text-slate-500'}">${pValStr}</td>
                         <td class="px-4 py-3 text-right text-slate-600 text-xs">${reason.join(', ')}</td>
