@@ -144,7 +144,8 @@
                     <!-- Outlier Residues Table -->
 
                     <div id="outlier-section" class="glass p-6 rounded-2xl hidden top-6">
-                        <h2 class="text-xl font-semibold mb-4 text-rose-600">Outlier Residues (Combined Distance > 3.0)
+                        <h2 class="text-xl font-semibold mb-4 text-rose-600">Outlier Residues (P-value < 0.05 or Dist>
+                                3.0)
                         </h2>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left text-slate-700">
@@ -155,6 +156,8 @@
                                         <th class="px-4 py-3 text-center">PC2</th>
                                         <th class="px-4 py-3 text-center">PC3</th>
                                         <th class="px-4 py-3 text-center">Combined Dist.</th>
+                                        <th class="px-4 py-3 text-center">Mahalanobis</th>
+                                        <th class="px-4 py-3 text-center">P-value</th>
                                         <th class="px-4 py-3 text-right">Reason</th>
                                     </tr>
                                 </thead>
@@ -370,7 +373,15 @@
         function renderOutlierTable(data) {
             const body = document.getElementById('outlier-table-body');
             body.innerHTML = '';
-            const threshold = 3.0; // Stricter Euclidean distance threshold
+
+            // Thresholds
+            const EUCLIDEAN_THRESHOLD = 3.0;
+            const P_VALUE_THRESHOLD = 0.05;
+
+            // Reset Global Outliers
+            currentOutliers = [];
+
+            const hasStats = data.mahalanobis_dist && data.p_values;
 
             data.residue_nos.forEach((resNo, idx) => {
                 const s1 = data.results[0].scores[idx];
@@ -378,30 +389,66 @@
                 const s3 = data.results[2]?.scores[idx] || 0;
                 const dist = Math.sqrt(s1 * s1 + s2 * s2 + s3 * s3);
 
-                if (dist > threshold) {
+                let isOutlier = false;
+                let reason = [];
+
+                // 1. Check P-value (Primary)
+                let pValStr = "-";
+                let mahaStr = "-";
+
+                if (hasStats) {
+                    const p = data.p_values[idx];
+                    const m = data.mahalanobis_dist[idx];
+                    pValStr = p.toExponential(2);
+                    mahaStr = m.toFixed(2);
+
+                    if (p < P_VALUE_THRESHOLD) {
+                        isOutlier = true;
+                        reason.push(`P < ${P_VALUE_THRESHOLD}`);
+                    }
+                }
+
+                // 2. Fallback / Complementary: Euclidean Distance
+                // If we don't have stats, OR if we want to combine criteria?
+                // The user asked to "Replace" the fixed Euclidean distance cutoff with P-value.
+                // However, holding on to strong geometric outliers might be safe.
+                // Let's make it an OR condition for robustness, or prioritize P-value.
+                // If stats are available, use P-value. If not, Dist.
+                if (!hasStats && dist > EUCLIDEAN_THRESHOLD) {
+                    isOutlier = true;
+                    reason.push(`Dist > ${EUCLIDEAN_THRESHOLD}`);
+                }
+
+                // Also Keep Component-wise check for visual "Reason" explanation if it helps?
+                // Actually, let's just stick to the main stat criteria to keep it clean.
+
+                if (isOutlier) {
+                    currentOutliers.push(resNo);
+
                     const tr = document.createElement('tr');
                     tr.className = 'border-b border-slate-200/50 hover:bg-slate-50/30 transition-colors';
-
-                    const reasons = [];
-                    if (Math.abs(s1) > 1.5) reasons.push(`PC1`);
-                    if (Math.abs(s2) > 1.5) reasons.push(`PC2`);
-                    if (Math.abs(s3) > 1.5) reasons.push(`PC3`);
-                    if (reasons.length === 0) reasons.push('Combined');
 
                     tr.innerHTML = `
                         <td class="px-4 py-3 font-semibold text-sky-600">Res ${resNo}</td>
                         <td class="px-4 py-3 text-center ${Math.abs(s1) > 1.5 ? 'text-rose-600' : ''}">${s1.toFixed(2)}</td>
                         <td class="px-4 py-3 text-center ${Math.abs(s2) > 1.5 ? 'text-rose-600' : ''}">${s2.toFixed(2)}</td>
                         <td class="px-4 py-3 text-center ${Math.abs(s3) > 1.5 ? 'text-rose-600' : ''}">${s3.toFixed(2)}</td>
-                        <td class="px-4 py-3 text-center font-bold text-rose-600">${dist.toFixed(2)}</td>
-                        <td class="px-4 py-3 text-right text-slate-600 text-xs">${reasons.join('+')}</td>
+                        <td class="px-4 py-3 text-center font-bold text-slate-700">${dist.toFixed(2)}</td>
+                        <td class="px-4 py-3 text-center font-mono text-xs text-indigo-600">${mahaStr}</td>
+                        <td class="px-4 py-3 text-center font-mono text-xs ${hasStats && data.p_values[idx] < P_VALUE_THRESHOLD ? 'text-red-600 font-bold' : 'text-slate-500'}">${pValStr}</td>
+                        <td class="px-4 py-3 text-right text-slate-600 text-xs">${reason.join(', ')}</td>
                     `;
                     body.appendChild(tr);
                 }
             });
 
             if (body.innerHTML === '') {
-                body.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-500 italic">No significant outliers detected using aggregate threshold (Dist > 3.0)</td></tr>';
+                body.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-slate-500 italic">No significant outliers detected (P < 0.05)</td></tr>';
+            }
+
+            // Update PDB Coloring if loaded
+            if (stage && stage.compList.length > 0) {
+                applyOutlierColoring(stage.compList[0]);
             }
         }
 
@@ -847,20 +894,9 @@
             // Update Global State for PDB Mapping
             if (data.residue_nos && data.residue_nos.length > 0) {
                 firstResidueNo = data.residue_nos[0];
-                const threshold = 3.0; // Keep consistent with Outlier Table
-                currentOutliers = [];
-                data.residue_nos.forEach((r, idx) => {
-                    const s1 = data.results[0].scores[idx];
-                    const s2 = data.results[1]?.scores[idx] || 0;
-                    const s3 = data.results[2]?.scores[idx] || 0;
-                    const dist = Math.sqrt(s1 * s1 + s2 * s2 + s3 * s3);
-                    if (dist > threshold) currentOutliers.push(r);
-                });
 
-                // If PDB is already loaded, re-apply coloring? 
-                if (stage && stage.compList.length > 0) {
-                    applyOutlierColoring(stage.compList[0]);
-                }
+                // OUTLIER LOGIC MOVED TO renderOutlierTable()
+                // Do not overwrite currentOutliers here.
 
                 // Show PDB Section (Upload Area)
                 const pdbSec = document.getElementById('pdb-section');
