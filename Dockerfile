@@ -2,12 +2,17 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV PORT=8000
-EXPOSE 8000
+WORKDIR /app/backend
+ENV PORT=7777
+EXPOSE 7777
 
-CMD ["python", "backend/main.py"]
+CMD ["python", "main.py"]
