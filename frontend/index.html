@@ -625,13 +625,23 @@
         function render3DPCA(data) {
             if (data.results.length < 3) return;
 
-            const threshold = 3.0;
+            // Use P-value threshold (0.05) instead of Euclidean distance
+            const P_VALUE_THRESHOLD = 0.05;
+            const hasStats = data.p_values && data.p_values.length === data.residue_nos.length;
+
             const textLabels = data.residue_nos.map((r, idx) => {
-                const s1 = data.results[0].scores[idx];
-                const s2 = data.results[1]?.scores[idx] || 0;
-                const s3 = data.results[2]?.scores[idx] || 0;
-                const dist = Math.sqrt(s1 * s1 + s2 * s2 + s3 * s3);
-                return dist > threshold ? `Res ${r}` : '';
+                let isOutlier = false;
+                if (hasStats) {
+                    if (data.p_values[idx] < P_VALUE_THRESHOLD) isOutlier = true;
+                } else {
+                    // Fallback to legacy distance if stats missing (shouldn't happen)
+                    const s1 = data.results[0].scores[idx];
+                    const s2 = data.results[1]?.scores[idx] || 0;
+                    const s3 = data.results[2]?.scores[idx] || 0;
+                    const dist = Math.sqrt(s1 * s1 + s2 * s2 + s3 * s3);
+                    if (dist > 3.0) isOutlier = true;
+                }
+                return isOutlier ? `Res ${r}` : '';
             });
 
             const traces = [{
@@ -644,7 +654,7 @@
                 textposition: 'top center',
                 marker: {
                     size: 4,
-                    color: textLabels.map(l => l ? '#fb7185' : '#38bdf8'),
+                    color: textLabels.map(l => l ? '#fb7185' : '#38bdf8'), // Red for outliers, Blue for normal
                     opacity: 0.8
                 }
             }];
