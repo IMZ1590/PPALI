@@ -491,8 +491,6 @@
             const hasStats = data.mahalanobis_dist && data.p_values;
 
             data.residue_nos.forEach((resNo, idx) => {
-                if (idx === 0) firstResidueNo = resNo; // Store first residue for PDB offset
-
                 const s1 = data.results[0].scores[idx];
                 const s2 = data.results[1]?.scores[idx] || 0;
                 const s3 = data.results[2]?.scores[idx] || 0;
@@ -1054,12 +1052,10 @@
 
         fetchExampleCSV();
 
-        
-        <footer class="mt-20 py-8 text-center text-slate-400 text-sm">
-            &copy; 2026 PPALI. Powered by KBSI.
-        </footer>
-
     </script>
+    <footer class="mt-20 py-8 text-center text-slate-400 text-sm">
+        &copy; 2026 PPALI. Powered by KBSI.
+    </footer>
 </body>
 
 </html>
