@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPALI</title>
+    <title>PALI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
@@ -139,9 +139,9 @@
             </div>
 
             <h1 class="text-4xl md:text-5xl font-bold mb-2 md:mb-4">
-                <span class="gradient-text">PPALI</span>
+                <span class="gradient-text">PALI</span>
             </h1>
-            <p class="text-lg md:text-xl text-slate-600">Peak-based PCA Analysis for Ligand Interactions</p>
+            <p class="text-lg md:text-xl text-slate-600">PCA Analysis for Ligand Interactions</p>
 
             <!-- Mobile Warning -->
             <p
@@ -578,7 +578,7 @@
             const wsVar = XLSX.utils.json_to_sheet(varianceData);
             XLSX.utils.book_append_sheet(wb, wsVar, "Variance");
 
-            XLSX.writeFile(wb, "PPALI_PCA_Results.xlsx");
+            XLSX.writeFile(wb, "PALI_PCA_Results.xlsx");
         }
 
         function renderOutlierTable(data) {

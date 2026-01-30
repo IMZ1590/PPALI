@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# PPALI - Startup Script (V1.0)
+# PALI - Startup Script (V1.0)
 # This script starts the backend server using the configured virtual environment.
 
 echo "------------------------------------------------"
-echo "Starting PPALI Backend Server..."
+echo "Starting PALI Backend Server..."
 echo "------------------------------------------------"
 
 # Change to the backend directory
