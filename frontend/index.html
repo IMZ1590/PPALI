@@ -177,7 +177,7 @@
                                     </svg>
                                     <p class="mb-2 text-sm text-slate-600"><span class="font-semibold">Click to
                                             upload</span> or drag and drop</p>
-                                    <p class="text-xs text-slate-500 px-4">CSV, XLSX (Format: Residue, H_CSP, N_CSP,
+                                    <p class="text-xs text-slate-500 px-4">CSV, XLSX (Format: Residue, Δδ<sub>H</sub>, Δδ<sub>N</sub>,
                                         Intensity...)</p>
                                 </div>
                                 <input id="dropzone-file" type="file" class="hidden" accept=".csv, .xlsx"
@@ -188,7 +188,7 @@
                             <label class="text-xs text-slate-600 block mb-2 font-bold text-center">— Or Paste
                                 Data Below —</label>
                             <textarea id="picked-data" rows="4"
-                                placeholder="Format: Residue, H_CSP, N_CSP, Intensity..."
+                                placeholder="Format: Residue, Δδ<sub>H</sub>, Δδ<sub>N</sub>, Intensity..."
                                 class="w-full bg-white border border-slate-200 rounded-lg px-3 py-3 text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                                 oninput="if(this.value.trim().length > 0) hideExample(); else showExample();"></textarea>
                         </div>
