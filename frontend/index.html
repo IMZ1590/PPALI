@@ -138,6 +138,13 @@
                     alt="KBSI Logo">
             </div>
 
+            <!-- Version Info (PALI 2 style) -->
+            <div class="absolute top-0 left-4 text-left hidden md:block">
+                <div class="text-sm text-indigo-500 font-bold bg-indigo-50 px-2 py-1 rounded inline-block mb-1">Demo Ver
+                </div>
+                <div class="text-[10px] text-slate-400">Last Release: 2026.02.13</div>
+            </div>
+
             <h1 class="text-4xl md:text-5xl font-bold mb-2 md:mb-4">
                 <span class="gradient-text">PALI</span>
             </h1>
@@ -177,7 +184,7 @@
                                     </svg>
                                     <p class="mb-2 text-sm text-slate-600"><span class="font-semibold">Click to
                                             upload</span> or drag and drop</p>
-                                    <p class="text-xs text-slate-500 px-4">CSV, XLSX (Format: Residue, Δδ<sub>H</sub>, Δδ<sub>N</sub>,
+                                    <p class="text-xs text-slate-500 px-4">CSV, XLSX (Format: Residue, H_CSP, N_CSP,
                                         Intensity...)</p>
                                 </div>
                                 <input id="dropzone-file" type="file" class="hidden" accept=".csv, .xlsx"
@@ -188,7 +195,7 @@
                             <label class="text-xs text-slate-600 block mb-2 font-bold text-center">— Or Paste
                                 Data Below —</label>
                             <textarea id="picked-data" rows="4"
-                                placeholder="Format: Residue, Δδ_H, Δδ_N, Intensity..."
+                                placeholder="Format: Residue, H_CSP, N_CSP, Intensity..."
                                 class="w-full bg-white border border-slate-200 rounded-lg px-3 py-3 text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                                 oninput="if(this.value.trim().length > 0) hideExample(); else showExample();"></textarea>
                         </div>
@@ -214,7 +221,7 @@
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left text-slate-700 border-collapse">
-                            <thead class="text-xs text-slate-600 bg-slate-50 font-semibold">
+                            <thead class="text-xs text-slate-600 bg-slate-50 uppercase font-semibold">
                                 <tr id="example-csv-header"></tr>
                             </thead>
                             <tbody id="example-csv-body"></tbody>
@@ -343,6 +350,17 @@
 
                             </div>
                             <!-- Viewer Container -->
+                            <div class="lg:col-span-3 flex flex-col space-y-2">
+                                <!-- Toolbar -->
+                                <div class="flex justify-end space-x-2">
+                                    <button onclick="handleToolbar('reset')"
+                                        class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-xs transition-colors">Reset
+                                        View</button>
+                                    <button onclick="handleToolbar('spin')"
+                                        class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-xs transition-colors">Spin</button>
+                                    <button onclick="handleToolbar('screenshot')"
+                                        class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-xs transition-colors">📸</button>
+                                </div>
                                 <div class="h-[400px] bg-white rounded-xl border border-slate-200 relative overflow-hidden"
                                     id="ngl-viewport">
                                     <!-- NGL Stage will be injected here -->
